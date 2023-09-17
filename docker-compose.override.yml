@@ -26,6 +26,7 @@ services:
     networks:
       - mynetwork  # Add this network configuration
     depends_on:
+      - rabbitmq
       - postgres
 
   producer.api:
@@ -40,10 +41,10 @@ services:
     networks:
       - mynetwork  # Add this network configuration
     depends_on:
+      - rabbitmq
       - postgres
 
   postgres:
-    image: postgres
     container_name: "postgres"
     environment:
       - POSTGRES_DB=mydb

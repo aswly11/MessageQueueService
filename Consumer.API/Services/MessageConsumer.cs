@@ -27,7 +27,10 @@ namespace Consumer.API.Services
                 Password = "mypass",
                 VirtualHost = "/"
             };
-            EnsureRabbitMQConnection();
+
+            _connection = _factory.CreateConnection();
+            _channel = _connection.CreateModel();
+
             this.serviceProvider = serviceProvider;
             var scope = serviceProvider.CreateScope();
             _consumerDBContext = scope.ServiceProvider.GetRequiredService<ConsumerDBContext>();
@@ -70,37 +73,6 @@ namespace Consumer.API.Services
             return Task.CompletedTask;
 
         }
-        private void EnsureRabbitMQConnection()
-        {
-            const int maxRetries = 5;
-            const int retryDelayMilliseconds = 5000; // 5 seconds
-
-            for (int retryCount = 0; retryCount < maxRetries; retryCount++)
-            {
-                try
-                {
-                    if (_connection == null || !_connection.IsOpen)
-                    {
-                        _connection = _factory.CreateConnection();
-                        _channel = _connection.CreateModel();
-                    }
-
-                    // Successfully established connection, break the loop
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    if (retryCount == maxRetries - 1)
-                    {
-                        // Reached max retries, throw the exception
-                        throw new Exception("Unable to establish RabbitMQ connection.", ex);
-                    }
-
-                    // Log the exception (or handle it as needed)
-                    Console.WriteLine($"Error while establishing RabbitMQ connection. Retrying in {retryDelayMilliseconds / 1000} seconds...");
-                    Thread.Sleep(retryDelayMilliseconds);
-                }
-            }
-        }
+       
     }
 }
