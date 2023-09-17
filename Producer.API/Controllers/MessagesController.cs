@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Producer.API.Data;
 using Producer.API.Models;
 using Producer.API.Services;
 
@@ -12,12 +13,12 @@ namespace Producer.API.Controllers
     {
         private readonly ILogger<MessagesController> _logger;
         private readonly IMessageProducer _messageProducer;
-
-        public static readonly List<Message> messages = new();
-        public MessagesController(ILogger<MessagesController> logger, IMessageProducer messageProducer)
+        private readonly ProducerDBContext _producerDBContext;
+        public MessagesController(ILogger<MessagesController> logger, IMessageProducer messageProducer, ProducerDBContext producerDBContext)
         {
             _logger = logger;
             _messageProducer = messageProducer;
+            _producerDBContext = producerDBContext;
         }
 
         [HttpPost]
@@ -26,7 +27,9 @@ namespace Producer.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            messages.Add(message);
+            await _producerDBContext.Messages.AddAsync(message);
+            await _producerDBContext.SaveChangesAsync();
+
             await _messageProducer.SendMesage(message);
 
             return Ok(message);

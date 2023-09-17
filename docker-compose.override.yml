@@ -25,6 +25,8 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     networks:
       - mynetwork  # Add this network configuration
+    depends_on:
+      - postgres
 
   producer.api:
     environment:
@@ -37,6 +39,17 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     networks:
       - mynetwork  # Add this network configuration
+    depends_on:
+      - postgres
 
+  postgres:
+    image: postgres
+    container_name: "postgres"
+    environment:
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - mynetwork
 networks:
   mynetwork:  # Define a custom network for the services
