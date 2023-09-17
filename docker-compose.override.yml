@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+  rabbitmq:
+    container_name: "tabbitmq"
+    environment:
+       - RABBITMQ_DEFAULT_USER=user
+       - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+       #RabbitMq Inestence
+       - '5672:5672'
+       #Web Interface
+       - '15672:15672' 
+  consumer.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:5001;
+    ports:
+      - "5001:5001"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+  producer.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:5002;
+    ports:
+      - "5002:5002"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro

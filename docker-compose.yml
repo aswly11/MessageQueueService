@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  rabbitmq:
+    container_name: "tabbitmq"
+    image: rabbitmq:3.8-management-alpine
+     
+  consumer.api:
+    image: ${DOCKER_REGISTRY-}consumerapi
+    build:
+      context: .
+      dockerfile: Consumer.API/Dockerfile
+
+  producer.api:
+    image: ${DOCKER_REGISTRY-}producerapi
+    build:
+      context: .
+      dockerfile: Producer.API/Dockerfile
+
