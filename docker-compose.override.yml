@@ -2,15 +2,18 @@ version: '3.4'
 
 services:
   rabbitmq:
-    container_name: "tabbitmq"
+    container_name: "rabbitmq"  # Corrected the container name
     environment:
        - RABBITMQ_DEFAULT_USER=user
        - RABBITMQ_DEFAULT_PASS=mypass
     ports:
-       #RabbitMq Inestence
+       # RabbitMQ Instance
        - '5672:5672'
-       #Web Interface
+       # Web Interface
        - '15672:15672' 
+    networks:
+      - mynetwork  # Add this network configuration
+
   consumer.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -20,6 +23,9 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - mynetwork  # Add this network configuration
+
   producer.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -29,3 +35,8 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - mynetwork  # Add this network configuration
+
+networks:
+  mynetwork:  # Define a custom network for the services

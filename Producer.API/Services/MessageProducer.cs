@@ -7,21 +7,25 @@ namespace Producer.API.Services
 
     public class MessageProducer : IMessageProducer
     {
-        public Task SendMesage<T>(T message)
+        private readonly ConnectionFactory _factory;
+        public MessageProducer()
         {
-            var factory = new ConnectionFactory()
+            _factory = new ConnectionFactory()
             {
-                HostName = "localhost",
+                HostName = "rabbitmq",
                 UserName = "user",
                 Password = "mypass",
                 VirtualHost = "/"
 
             };
-            var connetion = factory.CreateConnection();
+        }
+        public Task SendMesage<T>(T message)
+        {
+            var connetion = _factory.CreateConnection();
 
             using (var channel = connetion.CreateModel())
             {
-                channel.QueueDeclare("QueueName",durable:true , exclusive:true);
+                channel.QueueDeclare("QueueName",durable:true , exclusive:false);
                 var jsonMessage = JsonSerializer.Serialize(message);
                 var body = Encoding.UTF8.GetBytes(jsonMessage);
                 channel.BasicPublish("", "QueueName", body: body);
